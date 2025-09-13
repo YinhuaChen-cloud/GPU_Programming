@@ -204,6 +204,8 @@ void read_mnist(const std::string filename, int length, float* x, float* y)
   for(int i = 0; i<length; i++)
   {
     fin >> row;
+    if(i == 0)
+      continue;
     int pos = row.find(delim);
     int label = std::stoi(row.substr(0, pos+1));
     for(int j = 0; j<labels; j++)
