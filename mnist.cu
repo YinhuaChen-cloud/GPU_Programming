@@ -35,12 +35,22 @@ private:
   std::string name;
 };
 
+// forward 公式: Wx + b
+// batch_size 输入矩阵的列数，表示一个batch中样本的数量，也是输出矩阵的列数
+// n 输入矩阵的行数，也是权重矩阵的列数，表示每个样本的特征数量
+// out_w 权重矩阵的行数，表示这一层神经元输出的特征数量，即输出矩阵的行数
+// input 输入矩阵，大小为 (n, batch_size)
+// weights 权重矩阵，大小为 (out_w, n)
+// biases 偏置向量，大小为 (out_w, 1)  实际计算中会扩展为输出矩阵的大小 (out_w, batch_size)
+// output 输出矩阵，大小为 (out_w, batch_size)
 __global__ void forward(int batch_size, int n, int out_w, float* input, float* weights, float* biases, float* output)
 {
+  // 这里的 row 和 column 可以分别对应输出矩阵的行和列，输出矩阵每一个元素的计算都是相同且独立的
   int column = blockIdx.x*blockDim.x + threadIdx.x;
   int row = blockIdx.y*blockDim.y + threadIdx.y;
   if (row < batch_size && column < out_w)
   {
+    // TODO: 这里感觉 row 和 column 的命名反了，更符合直觉的应该是 row 对应 out_w，column 对应 batch_size
     output[row*out_w+column] = biases[column];
     for(int i = 0; i < n; i++)
     {
